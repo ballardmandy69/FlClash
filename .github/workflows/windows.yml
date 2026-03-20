@@ -19,11 +19,11 @@ jobs:
 
       - name: Show files
         run: |
-          dir
-          dir plugins
-          dir plugins\tray_manager
-          dir plugins\tray_manager\packages
-          dir plugins\tray_manager\packages\tray_manager
+          Get-ChildItem .
+          Get-ChildItem plugins
+          Get-ChildItem plugins\tray_manager
+          Get-ChildItem plugins\tray_manager\packages
+          Get-ChildItem plugins\tray_manager\packages\tray_manager
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -35,12 +35,12 @@ jobs:
 
       - name: Check tray_manager path
         run: |
-          if exist plugins\tray_manager\packages\tray_manager (
-            echo FOUND tray_manager
-          ) else (
-            echo tray_manager NOT FOUND
-            exit /b 1
-          )
+          if (Test-Path "plugins\tray_manager\packages\tray_manager") {
+            Write-Output "FOUND tray_manager"
+          } else {
+            Write-Output "tray_manager NOT FOUND"
+            exit 1
+          }
 
       - name: Get dependencies
         run: flutter pub get
