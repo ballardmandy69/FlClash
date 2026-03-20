@@ -1,0 +1,55 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Show files
+        run: |
+          dir
+          dir plugins
+          dir plugins\tray_manager
+          dir plugins\tray_manager\packages
+          dir plugins\tray_manager\packages\tray_manager
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Check tray_manager path
+        run: |
+          if exist plugins\tray_manager\packages\tray_manager (
+            echo FOUND tray_manager
+          ) else (
+            echo tray_manager NOT FOUND
+            exit /b 1
+          )
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Windows release
+        run: flutter build windows --release
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: build/windows/x64/runner/Release
